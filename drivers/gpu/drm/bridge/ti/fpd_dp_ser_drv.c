@@ -2256,14 +2256,17 @@ static int fpd_dp_ser_suspend(struct device *dev)
 static int fpd_dp_ser_resume(struct device *dev)
 {
 	bool result;
+	FPD_DP_SER_ELAPSED_TIME_LOGGER_INIT();
 
-	fpd_dp_ser_debug("[FPD_DP] [-%s-%s-%d-]\n", __FILE__, __func__, __LINE__);
+	fpd_dp_ser_debug("%s: resume start\n", __func__);
 
-	result = fpd_dp_ser_init();
+	FPD_DP_SER_ELAPSED_TIME_LOGGER_LOG_CALL(result = fpd_dp_ser_init());
 	if (!result) {
 		fpd_dp_ser_debug("Serdes enable fail in fpd_dp_ser_resume\n");
 		return -EIO;
 	}
+
+	fpd_dp_ser_debug("%s: resume completed\n", __func__);
 
 	return 0;
 }

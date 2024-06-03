@@ -25,13 +25,14 @@
 #ifndef __FPD_DP_SER_DEV_h__
 #define __FPD_DP_SER_DEV_h__
 
-#include <linux/init.h>
-#include <linux/module.h>
-#include <linux/i2c.h>
-#include <linux/platform_device.h>
-#include <linux/delay.h>
-#include <linux/workqueue.h>
 #include <drm/drm_modes.h>
+#include <linux/delay.h>
+#include <linux/i2c.h>
+#include <linux/init.h>
+#include <linux/ktime.h>
+#include <linux/module.h>
+#include <linux/platform_device.h>
+#include <linux/workqueue.h>
 
 #define FPD_DP_SER_TX_ADD                  0x14
 #define FPD_DP_SER_RX_ADD_A                0x30
@@ -70,6 +71,16 @@ struct fpd_dp_ser_priv {
 	struct workqueue_struct *motor_setup_wq;
 	int count;
 };
+
+#define FPD_DP_SER_ELAPSED_TIME_LOGGER_INIT() \
+	ktime_t start_time, stop_time, elapsed_time;
+#define FPD_DP_SER_ELAPSED_TIME_LOGGER_LOG_CALL(...) \
+	start_time = ktime_get(); \
+	__VA_ARGS__; \
+	stop_time = ktime_get(); \
+	elapsed_time = ktime_sub(stop_time, start_time); \
+	fpd_dp_ser_info("elapsed time (ms) in #FUNC: %lld\n",  \
+			ktime_to_ms(elapsed_time));
 
 void fpd_dp_ser_module_exit(void);
 int fpd_dp_ser_module_init(void);
